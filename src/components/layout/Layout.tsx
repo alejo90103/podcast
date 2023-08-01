@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import PropTypes, { InferProps } from 'prop-types';
 
-// import Header from './Header';
+import Header from './Header';
 
 type LayoutProps = {
   children?: ReactNode;
@@ -14,8 +14,9 @@ const Layout: React.FC<LayoutProps> = (props: InferProps<LayoutProps>) => {
   return (
     <React.Fragment>
       <CssBaseline />
-      <Container maxWidth="sm">
-        <Box sx={{ bgcolor: '#cfe8fc', height: '100vh' }}>
+      <Container component="main" maxWidth="md" sx={{ mb: 4 }}>
+        <Header />
+        <Box sx={{ bgcolor: '#cfe8fc', height: '100vh' }} className="container">
           {props.children}
         </Box>
       </Container>
