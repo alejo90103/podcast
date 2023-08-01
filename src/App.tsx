@@ -1,26 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-function App() {
+import './App.css';
+import { publicRoutes } from "./routes/app/routes";
+import Layout from './components/layout/Layout';
+
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+      <Suspense fallback={true}>
+        <Router>
+          <Routes>
+            {publicRoutes.map((route) => (
+              <Route 
+                key={route.id} 
+                path={route.path} 
+                element={
+                  <Layout>
+                    {route.component}
+                  </Layout>
+                } 
+              />
+            ))}
+          </Routes>
+        </Router>
+      </Suspense>
+    </React.Fragment>
   );
-}
+};
 
 export default App;
