@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import PropTypes, { InferProps } from 'prop-types';
 
-import Header from '../Header';
+import AudioPlayer from '../player/AudioPlayer';
 
 type LayoutProps = {
   children?: ReactNode;
@@ -19,6 +19,7 @@ const Layout: React.FC<LayoutProps> = (props: InferProps<LayoutProps>) => {
           {props.children}
         </Box>
       </Container>
+      <AudioPlayer />
     </React.Fragment>
   );
 };
