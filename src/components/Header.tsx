@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
-
-import { Podcast } from '../models/Podcast';
+import IconButton from '@mui/material/IconButton';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
 const Search = styled('div')(({ theme }) => ({
   borderRadius: 15,
@@ -39,36 +40,46 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 interface PodcastCardProps {
-  originalPodcasts: Podcast[];
-  setPodcasts: React.Dispatch<React.SetStateAction<Podcast[]>>;
+  onRequestSearch: (search: string) => void;
+  placehoder: string;
   back?: boolean
 }
 
-const Header: React.FC<PodcastCardProps> = ({ originalPodcasts, setPodcasts, back=false }) => {
-  // search specific podcast by name or artist
-  const handleSearchPodcasts = (e: React.ChangeEvent<HTMLInputElement>) => {
+const Header: React.FC<PodcastCardProps> = ({ onRequestSearch, placehoder, back=false }) => {
+  const navigate = useNavigate();
+
+  // search data
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const search = e.target.value.toLowerCase();
-    const filtered = originalPodcasts.filter(e => {
-      if (e["im:name"].label.toLowerCase().includes(search) || e["im:artist"].label.toLowerCase().includes(search)) {
-        return e;
-      }
-    });
-    setPodcasts(filtered);
+    onRequestSearch(search);
   } 
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar position="static" sx={{ boxShadow: 'none' }} className="container">
         <Toolbar className="container">
+          {
+            back &&
+            <IconButton
+              sx={{
+                background: '#1A1A1A',
+                borderRadius: 5,
+                marginRight: 2
+              }}
+              onClick={() => navigate(-1)}
+            >
+              <ArrowBackIosIcon sx={{ color: 'white', marginLeft: 1 }} />
+            </IconButton>
+          }
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder="podcast"
+              placeholder={placehoder}
               sx={{ width: '100%' }}
-              inputProps={{ 'aria-label': 'podcast' }}
-              onChange={handleSearchPodcasts}
+              inputProps={{ 'aria-label': placehoder }}
+              onChange={handleSearch}
             />
           </Search>
         </Toolbar>
