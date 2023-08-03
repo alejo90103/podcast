@@ -6,21 +6,16 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import CardContent from '@mui/material/CardContent';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import dayjs from 'dayjs';
 import 'dayjs/locale/en';
 import relativeTime from 'dayjs/plugin/relativeTime';
-
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-
-import DownArrow from '../components/icons/DownArrow';
+import { SelectChangeEvent } from '@mui/material/Select';
 
 import { Podcast } from '../models/Podcast';
 import { PODCAST } from '../routes/app/paths';
 import { PODCAST_API_ALL } from '../routes/api/paths';
 import Header from '../components/Header';
+import Sort from '../components/Sort';
 import useLocalStorage from "../hooks/useLocalStorage";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
@@ -212,29 +207,7 @@ const Podcasts: React.FC = () => {
       <Header onRequestSearch={handleSearchPodcasts} placehoder={"podcast"} />
       <Grid container>
         <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
-          <Select
-            disableUnderline
-            defaultValue={"0"}
-            IconComponent={() => <DownArrow color={'white'} width="28" height="28" />}
-            sx={{
-              color: 'white'
-            }}
-            onChange={handleChangeOrder}
-          >
-            <MenuItem disabled value={0}>
-              <em>Order by</em>
-            </MenuItem>
-            <MenuItem value={"asc"}>
-              <span style={{marginTop:3}}>
-                Name (Asc)
-              </span>
-            </MenuItem>
-            <MenuItem value={"desc"}>
-              <span style={{marginTop:3}}>
-                Name (Desc)
-              </span>
-            </MenuItem>
-          </Select>
+          <Sort onRequestSort={handleChangeOrder} />
         </Grid>
       </Grid>
       <div style={{ width: '100%' }}>

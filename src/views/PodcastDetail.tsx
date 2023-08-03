@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { SelectChangeEvent } from '@mui/material/Select';
+import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import CardContent from '@mui/material/CardContent';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import IconButton from '@mui/material/IconButton';
 import dayjs from 'dayjs';
 import 'dayjs/locale/en';
@@ -18,6 +19,7 @@ import { PODCAST_API_DETAIL, CORS } from '../routes/api/paths';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { formatTimeMillis } from '../utils/utils';
 import Header from '../components/Header';
+import Sort from '../components/Sort';
 
 import Play from '../components/icons/Play';
 import Pause from '../components/icons/Pause';
@@ -272,6 +274,21 @@ const PodcastDetail: React.FC = () => {
     }
   }
 
+  // sort podcast
+  const handleChangeOrder = (event: SelectChangeEvent) => {
+    const order = event.target.value;
+    const sortedEpisodes = [...originalEpisodes].sort((a, b) => {
+      const nameA = a.title.toLowerCase();
+      const nameB = b.title.toLowerCase();
+      if (order === 'asc') {
+        return nameA.localeCompare(nameB);
+      }
+      return nameB.localeCompare(nameA);
+    });
+    setEpisodes(sortedEpisodes);
+    setOriginalEpisodes(sortedEpisodes);
+  };
+
   return (
     <>
       <Header onRequestSearch={handleSearchEpisodes} placehoder={"episode"} back={true} />
@@ -289,9 +306,17 @@ const PodcastDetail: React.FC = () => {
             transform: 'rotateY(180deg)',
           }}
         />
-        <Typography color="white" component="div" variant="h4" align="center" sx={{ fontWeight: 'bold' }}>
-          {podcast['im:name'].label}
-        </Typography>
+        <Grid container>
+          <Grid item xs={2} />
+          <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Typography color="white" component="div" variant="h4" align="center" sx={{ fontWeight: 'bold' }}>
+              {podcast['im:name'].label}
+            </Typography>
+          </Grid>
+          <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'end' }}>
+            <Sort onRequestSort={handleChangeOrder} />
+          </Grid>
+        </Grid>
         <StyledDataGrid
           getRowId={(row) => row.guid}
           rows={episodes}
