@@ -11,6 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import dayjs from 'dayjs';
 import 'dayjs/locale/en';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useErrorBoundary } from "react-error-boundary";
 
 import { Podcast } from '../models/Podcast';
 import { Episode } from '../models/Episode';
@@ -138,6 +139,7 @@ function columns(currentEpisode: Episode, podcast: Podcast, handlePlay: (params:
 
 const PodcastDetail: React.FC = () => {
   const location = useLocation();
+  const { showBoundary } = useErrorBoundary();
   const context = useEpisodesContext();
   const setEpisodesContext = context?.setEpisodesContext ?? (() => {});
   const setCurrentEpisodeIndex = context?.setCurrentEpisodeIndex ?? (() => {});
@@ -192,7 +194,7 @@ const PodcastDetail: React.FC = () => {
         // setLoading(false);
       })
       .catch((error) => { 
-        // showBoundary(error); 
+        showBoundary(error);
       });
   }
 

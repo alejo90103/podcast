@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/en';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { SelectChangeEvent } from '@mui/material/Select';
+import { useErrorBoundary } from "react-error-boundary";
 
 import { Podcast } from '../models/Podcast';
 import { PODCAST } from '../routes/app/paths';
@@ -100,6 +101,7 @@ function columns(onRequestViewDetail = (podcast: Podcast) => {}): GridColDef[] {
 
 const Podcasts: React.FC = () => {
   const navigate = useNavigate();
+  const { showBoundary } = useErrorBoundary();
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
   const [originalPodcasts, setOriginalPodcasts] = useState<Podcast[]>([]);
   const data = useLocalStorage('listData');
@@ -117,7 +119,7 @@ const Podcasts: React.FC = () => {
         // setLoading(false);
       })
       .catch((error) => {
-        // showBoundary(error);
+        showBoundary(error);
       });
   };
 
