@@ -10,6 +10,7 @@ import Slider from '@mui/material/Slider';
 import VolumeUpRounded from '@mui/icons-material/VolumeUpRounded';
 import VolumeDownRounded from '@mui/icons-material/VolumeDownRounded';
 import Stack from '@mui/material/Stack';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Play from '../icons/Play';
 import Pause from '../icons/Pause';
@@ -17,12 +18,11 @@ import StepFoward from '../icons/StepFoward';
 import StepBack from '../icons/StepBack';
 import Shuffle from '../icons/Shuffle';
 import Reload from '../icons/Reload';
-
-import { Episode } from '../../models/Episode';
 import useEpisodesContext from '../../hooks/useEpisodesContext';
 
 const AudioPlayer = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const context = useEpisodesContext();
   const episodesContext = context?.episodesContext ?? [];
   const currentEpisodeIndex = context?.currentEpisodeIndex ?? 0;
@@ -36,6 +36,7 @@ const AudioPlayer = () => {
   const [paused, setPaused] = useState(true);
   const [audioSrc, setAudioSrc] = useState('');
   const [audioType, setAudioType] = useState('');
+  const [isMetadataLoaded, setIsMetadataLoaded] = useState(true);
 
   // Function to format duration
   const formatDuration = (value: number) => {
@@ -123,6 +124,7 @@ const AudioPlayer = () => {
 
   // Function to handle duration update when metadata is loaded
   const handleMetadataLoaded = () => {
+    setIsMetadataLoaded(true);
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
       handlePlayPause();
@@ -148,6 +150,7 @@ const AudioPlayer = () => {
     if (audioRef.current) {
       if (episodesContext.length > 0) {
         const currentEpisode = episodesContext[currentEpisodeIndex];
+        setIsMetadataLoaded(false);
         setCurrentEpisode(currentEpisode);
         setAudioSrc(currentEpisode.audio);
         setAudioType(currentEpisode.audioType);
@@ -202,18 +205,23 @@ const AudioPlayer = () => {
                 <IconButton aria-label="previous" onClick={handleSkipBack}>
                   <StepBack color={"#fff"} />
                 </IconButton>
-                <IconButton aria-label="play/pause" onClick={handlePlayPause}>
-                  { paused 
-                    ? <Play color={"#fff"} width="28" height="28" />
-                    : <IconButton 
-                        sx={{
-                          background: '#5C67DE',
-                          borderRadius: 5,
-                        }}
-                      >
-                        <Pause color={"#fff"} width="20" height="20" />
-                      </IconButton> }
-                </IconButton>
+                {
+                  !isMetadataLoaded
+                  ? <CircularProgress />
+                  :
+                    <IconButton aria-label="play/pause" onClick={handlePlayPause}>
+                      { paused 
+                        ? <Play color={"#fff"} width="28" height="28" />
+                        : <IconButton 
+                            sx={{
+                              background: '#5C67DE',
+                              borderRadius: 5,
+                            }}
+                          >
+                            <Pause color={"#fff"} width="20" height="20" />
+                          </IconButton> }
+                    </IconButton>
+                }
                 <IconButton aria-label="next" onClick={handleSkipForward}>
                   <StepFoward color={"#fff"} />
                 </IconButton>
