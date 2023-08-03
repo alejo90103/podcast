@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import { useErrorBoundary } from "react-error-boundary";
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import CardContent from '@mui/material/CardContent';
+import CircularProgress from '@mui/material/CircularProgress';
+import { SelectChangeEvent } from '@mui/material/Select';
 import dayjs from 'dayjs';
 import 'dayjs/locale/en';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { SelectChangeEvent } from '@mui/material/Select';
-import { useErrorBoundary } from "react-error-boundary";
 
 import { Podcast } from '../models/Podcast';
 import { PODCAST } from '../routes/app/paths';
@@ -105,6 +106,7 @@ const Podcasts: React.FC = () => {
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
   const [originalPodcasts, setOriginalPodcasts] = useState<Podcast[]>([]);
   const data = useLocalStorage('listData');
+  const [loading, setLoading] = useState(true);
 
   // fetch all postcast and storage in localstorage
   const getPodcasts = () => {
@@ -116,7 +118,7 @@ const Podcasts: React.FC = () => {
         setOriginalPodcasts(podcasts);
         const currentDate = new Date().getTime();
         localStorage.setItem('listData', JSON.stringify({ podcasts, lastRequestDate: currentDate }));
-        // setLoading(false);
+        setLoading(false);
       })
       .catch((error) => {
         showBoundary(error);
@@ -129,7 +131,7 @@ const Podcasts: React.FC = () => {
       // use the list stored in the local storage
       setPodcasts(data.podcasts);
       setOriginalPodcasts(data.podcasts);
-      // setLoading(false);
+      setLoading(false);
     } else {
       // fetch the list from the external service
       getPodcasts();      
@@ -177,20 +179,24 @@ const Podcasts: React.FC = () => {
           <Sort onRequestSort={handleChangeOrder} />
         </Grid>
       </Grid>
-      <div style={{ width: '100%' }}>
-        <StyledDataGrid
-          getRowId={(row) => row.id.attributes['im:id']}
-          rows={podcasts}
-          columns={columns(handleDetail)}
-          disableRowSelectionOnClick
-          getRowHeight={() => 80}
-          sx={{
-            '& .MuiDataGrid-columnHeaders': {
-              borderColor: '#ffffff08',
-            }
-          }}
-          {...data}
-        />
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+        {
+          loading
+          ? <CircularProgress />
+          : <StyledDataGrid
+              getRowId={(row) => row.id.attributes['im:id']}
+              rows={podcasts}
+              columns={columns(handleDetail)}
+              disableRowSelectionOnClick
+              getRowHeight={() => 80}
+              sx={{
+                '& .MuiDataGrid-columnHeaders': {
+                  borderColor: '#ffffff08',
+                }
+              }}
+              {...data}
+            />
+        }
       </div>
     </>
   )

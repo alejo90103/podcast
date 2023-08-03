@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useErrorBoundary } from "react-error-boundary";
 import { useLocation } from "react-router-dom";
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { SelectChangeEvent } from '@mui/material/Select';
+import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
@@ -11,7 +13,6 @@ import IconButton from '@mui/material/IconButton';
 import dayjs from 'dayjs';
 import 'dayjs/locale/en';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { useErrorBoundary } from "react-error-boundary";
 
 import { Podcast } from '../models/Podcast';
 import { Episode } from '../models/Episode';
@@ -21,7 +22,6 @@ import { formatTimeMillis } from '../utils/utils';
 import Header from '../components/Header';
 import Sort from '../components/Sort';
 import { StyledDataGrid } from '../components/StyledDataGrid';
-
 import Play from '../components/icons/Play';
 import Pause from '../components/icons/Pause';
 import Clock from '../components/icons/Clock';
@@ -165,6 +165,7 @@ const PodcastDetail: React.FC = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [originalEpisodes, setOriginalEpisodes] = useState<Episode[]>([]);
   const data = useLocalStorage(`data${location.state.podcast.id.attributes["im:id"]}`);
+  const [loading, setLoading] = useState(true);
 
   // fetch postcast detail and storage in localstorage
   const getPodcastDetail = (podcastId: string, author: string) => {
@@ -191,7 +192,7 @@ const PodcastDetail: React.FC = () => {
         setEpisodes(episodes);
         setOriginalEpisodes(episodes);
         localStorage.setItem(`data${podcastId}`, JSON.stringify({ episodes, lastRequestDate: new Date().getTime() }));
-        // setLoading(false);
+        setLoading(false);
       })
       .catch((error) => { 
         showBoundary(error);
@@ -209,7 +210,7 @@ const PodcastDetail: React.FC = () => {
         setEpisodesContext(data.episodes);
         setEpisodes(data.episodes);
         setOriginalEpisodes(data.episodes);        
-        // setLoading(false);
+        setLoading(false);
       } else {
         // Fetch the list from the external service again
         setTimeout(() => {
@@ -281,19 +282,25 @@ const PodcastDetail: React.FC = () => {
             <Sort onRequestSort={handleChangeOrder} />
           </Grid>
         </Grid>
-        <StyledDataGrid
-          getRowId={(row) => row.guid}
-          rows={episodes}
-          columns={columns(currentEpisode, podcast, handlePlay)}
-          disableRowSelectionOnClick
-          getRowHeight={() => 80}
-          sx={{
-            '& .MuiDataGrid-columnHeaders': {
-              borderColor: '#ffffff08',
-            }
-          }}
-          {...data}
-        />
+        {
+          loading
+          ? <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+              <CircularProgress />
+            </div>
+          : <StyledDataGrid
+              getRowId={(row) => row.guid}
+              rows={episodes}
+              columns={columns(currentEpisode, podcast, handlePlay)}
+              disableRowSelectionOnClick
+              getRowHeight={() => 80}
+              sx={{
+                '& .MuiDataGrid-columnHeaders': {
+                  borderColor: '#ffffff08',
+                }
+              }}
+              {...data}
+            />
+        }
       </div>
     </>
   )
