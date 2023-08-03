@@ -56,8 +56,8 @@ const Header: React.FC<PodcastCardProps> = ({ onRequestSearch, placehoder, back=
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ boxShadow: 'none' }} className="container">
-        <Toolbar className="container">
+      <AppBar position="static" sx={{ boxShadow: 'none' }}>
+        <Toolbar className="bgColor">
           {
             back &&
             <IconButton

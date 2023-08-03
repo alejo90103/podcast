@@ -22,16 +22,6 @@ dayjs.extend(relativeTime);
 function columns(onRequestViewDetail = (podcast: Podcast) => {}): GridColDef[] {
   return [
     {
-      field: '#',
-      headerName: '# ',
-      width: 50,
-      renderCell: () => {
-        return (
-          <PlayArrowIcon sx={{ color: 'white' }} />
-        );
-      }
-    },
-    {
       field: 'im:artist',
       headerName: 'Name',
       width: 350,

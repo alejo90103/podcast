@@ -14,8 +14,8 @@ const Layout: React.FC<LayoutProps> = (props: InferProps<LayoutProps>) => {
   return (
     <React.Fragment>
       <CssBaseline />
-      <Container component="main" maxWidth="md" sx={{ mb: 4 }}>
-        <Box sx={{ bgcolor: '#cfe8fc', height: '100vh' }} className="container">
+      <Container component="main" maxWidth="md" sx={{ mb: 4 }} className="bgColor">
+        <Box className="bgColor">
           {props.children}
         </Box>
       </Container>

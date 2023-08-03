@@ -7,36 +7,53 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import CardContent from '@mui/material/CardContent';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import IconButton from '@mui/material/IconButton';
 import dayjs from 'dayjs';
 import 'dayjs/locale/en';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 import { Podcast } from '../models/Podcast';
 import { Episode } from '../models/Episode';
-import { PODCAST } from '../routes/app/paths';
 import { PODCAST_API_DETAIL, CORS } from '../routes/api/paths';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { formatTimeMillis } from '../utils/utils';
 import Header from '../components/Header';
 
+import Play from '../components/icons/Play';
+import Pause from '../components/icons/Pause';
+import Clock from '../components/icons/Clock';
+
+import useEpisodesContext from '../hooks/useEpisodesContext';
+
 dayjs.extend(relativeTime);
 
-function columns(podcast: Podcast): GridColDef[] {
+function columns(currentEpisode: Episode, podcast: Podcast, handlePlay: (params: GridRenderCellParams) => void): GridColDef[] {
   return [
     {
       field: '#',
       headerName: '# ',
       width: 50,
-      renderCell: () => {
+      renderCell: (params: GridRenderCellParams) => {
         return (
-          <PlayArrowIcon sx={{ color: 'white' }} />
+            (currentEpisode.guid === params.row.guid)
+              ? <IconButton 
+                  sx={{
+                    background: '#5C67DE',
+                    borderRadius: 5,
+                  }}
+                >
+                  <Pause color={"#fff"} width="20" height="20" />
+                </IconButton>
+              : <IconButton onClick={(() => handlePlay(params))}>
+                  <Play color={"#fff"} width="20" height="20" />
+                </IconButton>
         );
       }
     },
     {
       field: 'title',
       headerName: 'Title',
-      width: 350,
+      width: 300,
       renderCell: (params: GridRenderCellParams) => {
         return (
           <>
@@ -109,6 +126,10 @@ function columns(podcast: Podcast): GridColDef[] {
       field: 'duration',
       headerName: 'Duration',
       width: 130,
+      renderHeader: () => <Clock color='white' />,
+      // renderCell: (params: GridRenderCellParams) => {
+        
+      // }
     },
   ];
 };
@@ -143,6 +164,9 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   '& .MuiDataGrid-cell': {
     color: 'rgba(255, 255, 255, 0.30)',
   },
+  '& .MuiDataGrid-cell:focus': {
+    outline: 'none',
+  },
   '& .MuiPaginationItem-root': {
     borderRadius: 0,
   },
@@ -150,6 +174,21 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 
 const PodcastDetail: React.FC = () => {
   const location = useLocation();
+  const context = useEpisodesContext();
+  const setEpisodesContext = context?.setEpisodesContext ?? (() => {});
+  const setCurrentEpisodeIndex = context?.setCurrentEpisodeIndex ?? (() => {});
+  const setCurrentEpisode = context?.setCurrentEpisode ?? (() => {});
+  const currentEpisode = context?.currentEpisode ?? {
+    title: '',
+    date: '',
+    duration: '',
+    description: '',
+    guid: '',
+    audio: '',
+    audioType: '',
+    image: '',
+    author: ''
+  };
   const [podcast, setPodcast] = useState<Podcast>({
     'id': { attributes: { 'im:id': '' } },
     'im:image': [],
@@ -162,12 +201,11 @@ const PodcastDetail: React.FC = () => {
   const data = useLocalStorage(`data${location.state.podcast.id.attributes["im:id"]}`);
 
   // fetch postcast detail and storage in localstorage
-  const getPodcastDetail = (podcastId: string) => {
+  const getPodcastDetail = (podcastId: string, author: string) => {
     const url = `${PODCAST_API_DETAIL}${podcastId}&media=podcast&entity=podcastEpisode&limit=20`;
     fetch(`${CORS}${encodeURIComponent(url)}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data.results);
         const episodes: Episode[] = data.results
           .filter((p : any) => p.wrapperType === "podcastEpisode")
           .map((e: any) => {
@@ -180,8 +218,10 @@ const PodcastDetail: React.FC = () => {
               audio: e.episodeUrl,
               audioType: `${e.episodeContentType}/${e.episodeFileExtension}`,
               image: e.artworkUrl60,
+              author
             }
           });
+        setEpisodesContext(episodes);
         setEpisodes(episodes);
         setOriginalEpisodes(episodes);
         localStorage.setItem(`data${podcastId}`, JSON.stringify({ episodes, lastRequestDate: new Date().getTime() }));
@@ -200,16 +240,14 @@ const PodcastDetail: React.FC = () => {
       // if has storage data
       if (data) {
         // Use the list stored in the local storage
+        setEpisodesContext(data.episodes);
         setEpisodes(data.episodes);
-        setOriginalEpisodes(data.episodes);
-        // console.log(data.episodes);
-        
+        setOriginalEpisodes(data.episodes);        
         // setLoading(false);
       } else {
         // Fetch the list from the external service again
-        // getPodcastDetail(podcast.id.attributes["im:id"]);
         setTimeout(() => {
-          getPodcastDetail(podcast.id.attributes["im:id"]);
+          getPodcastDetail(podcast.id.attributes["im:id"], podcast['im:name'].label);
         }, 1000);
       }
     }
@@ -225,6 +263,14 @@ const PodcastDetail: React.FC = () => {
     });
     setEpisodes(filtered);
   } 
+
+  const handlePlay = (record: GridRenderCellParams) => {
+    const index = episodes.findIndex((e) => e.guid === record.row.guid);
+    if (index !== -1) {
+      setCurrentEpisodeIndex(index);
+      setCurrentEpisode(episodes[index]);
+    }
+  }
 
   return (
     <>
@@ -249,7 +295,7 @@ const PodcastDetail: React.FC = () => {
         <StyledDataGrid
           getRowId={(row) => row.guid}
           rows={episodes}
-          columns={columns(podcast)}
+          columns={columns(currentEpisode, podcast, handlePlay)}
           disableRowSelectionOnClick
           getRowHeight={() => 80}
           sx={{

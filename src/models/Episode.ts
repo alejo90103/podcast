@@ -7,4 +7,5 @@ export type Episode = {
   audio: string;
   audioType: string;
   image: string;
+  author: string;
 };
