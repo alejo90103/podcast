@@ -3,6 +3,7 @@
   <a href="https://github.com/othneildrew/Best-README-Template">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/React.svg/1200px-React.svg.png" alt="Logo" width="80" height="80">
   </a>
+  <video src="https://timelapapi.codeals.es/video.mov" />
 </div>
 
 ## About Project
