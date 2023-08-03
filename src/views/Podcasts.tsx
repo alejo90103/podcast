@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
+import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -9,6 +10,12 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import dayjs from 'dayjs';
 import 'dayjs/locale/en';
 import relativeTime from 'dayjs/plugin/relativeTime';
+
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+
+import DownArrow from '../components/icons/DownArrow';
 
 import { Podcast } from '../models/Podcast';
 import { PODCAST } from '../routes/app/paths';
@@ -152,7 +159,7 @@ const Podcasts: React.FC = () => {
       .catch((error) => {
         // showBoundary(error);
       });
-  }
+  };
 
   // check if podcast exist in storage
   useEffect(() => {
@@ -173,7 +180,7 @@ const Podcasts: React.FC = () => {
     navigate(`${PODCAST}/${podcast.id.attributes["im:id"]}`, {
       state: { podcast: podcast }
     });
-  }
+  };
 
   // search specific podcast by name or artist
   const handleSearchPodcasts = (search: string) => {
@@ -183,11 +190,53 @@ const Podcasts: React.FC = () => {
       }
     });
     setPodcasts(filtered);
-  } 
+  };
+
+  // sort podcast
+  const handleChangeOrder = (event: SelectChangeEvent) => {
+    const order = event.target.value;
+    const sortedPodcasts = [...originalPodcasts].sort((a, b) => {
+      const nameA = a['im:name'].label.toLowerCase();
+      const nameB = b['im:name'].label.toLowerCase();
+      if (order === 'asc') {
+        return nameA.localeCompare(nameB);
+      }
+      return nameB.localeCompare(nameA);
+    });
+    setPodcasts(sortedPodcasts);
+    setOriginalPodcasts(sortedPodcasts);
+  };
 
   return (
     <>
       <Header onRequestSearch={handleSearchPodcasts} placehoder={"podcast"} />
+      <Grid container>
+        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
+          <Select
+            disableUnderline
+            defaultValue={"0"}
+            IconComponent={() => <DownArrow color={'white'} width="28" height="28" />}
+            sx={{
+              color: 'white'
+            }}
+            onChange={handleChangeOrder}
+          >
+            <MenuItem disabled value={0}>
+              <em>Order by</em>
+            </MenuItem>
+            <MenuItem value={"asc"}>
+              <span style={{marginTop:3}}>
+                Name (Asc)
+              </span>
+            </MenuItem>
+            <MenuItem value={"desc"}>
+              <span style={{marginTop:3}}>
+                Name (Desc)
+              </span>
+            </MenuItem>
+          </Select>
+        </Grid>
+      </Grid>
       <div style={{ width: '100%' }}>
         <StyledDataGrid
           getRowId={(row) => row.id.attributes['im:id']}
