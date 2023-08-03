@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from "react-router-dom";
-import { styled } from '@mui/material/styles';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { SelectChangeEvent } from '@mui/material/Select';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
@@ -20,6 +19,7 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import { formatTimeMillis } from '../utils/utils';
 import Header from '../components/Header';
 import Sort from '../components/Sort';
+import { StyledDataGrid } from '../components/StyledDataGrid';
 
 import Play from '../components/icons/Play';
 import Pause from '../components/icons/Pause';
@@ -135,44 +135,6 @@ function columns(currentEpisode: Episode, podcast: Podcast, handlePlay: (params:
     },
   ];
 };
-
-const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-  border: 0,
-  color: 'rgba(255, 255, 255, 0.30)',
-  fontSize: 14,
-  fontFamily: [
-    '-apple-system',
-    'BlinkMacSystemFont',
-    '"Segoe UI"',
-    'Roboto',
-    '"Helvetica Neue"',
-    'Arial',
-    'sans-serif',
-    '"Apple Color Emoji"',
-    '"Segoe UI Emoji"',
-    '"Segoe UI Symbol"',
-  ].join(','),
-  WebkitFontSmoothing: 'auto',
-  // letterSpacing: 'normal',
-  '& .MuiDataGrid-iconSeparator': {
-    display: 'none',
-  },
-  '& .MuiDataGrid-columnHeader, .MuiDataGrid-cell': {
-    borderColor: `1px solid #ffffff08`,
-  },
-  '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
-    borderBottom: `1px solid #ffffff08`,
-  },
-  '& .MuiDataGrid-cell': {
-    color: 'rgba(255, 255, 255, 0.30)',
-  },
-  '& .MuiDataGrid-cell:focus': {
-    outline: 'none',
-  },
-  '& .MuiPaginationItem-root': {
-    borderRadius: 0,
-  },
-}));
 
 const PodcastDetail: React.FC = () => {
   const location = useLocation();

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
@@ -17,7 +16,8 @@ import { PODCAST_API_ALL } from '../routes/api/paths';
 import Header from '../components/Header';
 import Sort from '../components/Sort';
 import useLocalStorage from "../hooks/useLocalStorage";
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { StyledDataGrid } from '../components/StyledDataGrid';
 
 dayjs.extend(relativeTime);
 
@@ -44,7 +44,7 @@ function columns(onRequestViewDetail = (podcast: Podcast) => {}): GridColDef[] {
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <CardContent sx={{ flex: '1 0 auto' }}>
-                <Typography color="white" component="div" onClick={() => onRequestViewDetail(params.row)}>
+                <Typography color="white" component="div" sx={{ cursor: 'pointer' }} onClick={() => onRequestViewDetail(params.row)}>
                   {params.row['im:name'].label}
                 </Typography>
                 <Typography sx={{ fontSize: 14 }} component="div">
@@ -97,41 +97,6 @@ function columns(onRequestViewDetail = (podcast: Podcast) => {}): GridColDef[] {
     },
   ];
 };
-
-const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-  border: 0,
-  color: 'rgba(255, 255, 255, 0.30)',
-  fontSize: 14,
-  fontFamily: [
-    '-apple-system',
-    'BlinkMacSystemFont',
-    '"Segoe UI"',
-    'Roboto',
-    '"Helvetica Neue"',
-    'Arial',
-    'sans-serif',
-    '"Apple Color Emoji"',
-    '"Segoe UI Emoji"',
-    '"Segoe UI Symbol"',
-  ].join(','),
-  WebkitFontSmoothing: 'auto',
-  // letterSpacing: 'normal',
-  '& .MuiDataGrid-iconSeparator': {
-    display: 'none',
-  },
-  '& .MuiDataGrid-columnHeader, .MuiDataGrid-cell': {
-    borderColor: `1px solid #ffffff08`,
-  },
-  '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
-    borderBottom: `1px solid #ffffff08`,
-  },
-  '& .MuiDataGrid-cell': {
-    color: 'rgba(255, 255, 255, 0.30)',
-  },
-  '& .MuiPaginationItem-root': {
-    borderRadius: 0,
-  },
-}));
 
 const Podcasts: React.FC = () => {
   const navigate = useNavigate();
